@@ -265,22 +265,22 @@ def process_as3935_interrupt():
     as3935LastInterrupt = reason
 
     if reason == 0x00:
-	    as3935LastStatus = "Spurious Interrupt"
+        as3935LastStatus = "Spurious Interrupt"
     elif reason == 0x01:
-	    as3935LastStatus = "Noise Floor too low. Adjusting"
+        as3935LastStatus = "Noise Floor too low. Adjusting"
         as3935.raise_noise_floor()
     elif reason == 0x04:
-	    as3935LastStatus = "Disturber detected - masking"
+	as3935LastStatus = "Disturber detected - masking"
         as3935.set_mask_disturber(True)
     elif reason == 0x08:
         now = datetime.now().strftime('%H:%M:%S - %m/%d/%Y')
         distance = as3935.get_distance()
         as3935LastStatus = "Lightning Detected "  + str(distance) + "km away. (%s)" % now
-		tweet = "DANGER!: "+str(as3935LastStatus)
-		twitter = Twython(config.consumer_key, config.consumer_secret, config.access_key, config.access_secret)
-		twitter.update_status(status=tweet)
-		print("Tweeted: {}".format(tweet))
-		pclogging.log(pclogging.INFO, __name__, "Lightning Detected "  + str(distance) + "km away. (%s)" % now)
+	tweet = "DANGER!: "+str(as3935LastStatus)
+	twitter = Twython(config.consumer_key, config.consumer_secret, config.access_key, config.access_secret)
+	twitter.update_status(status=tweet)
+	print("Tweeted: {}".format(tweet))
+	pclogging.log(pclogging.INFO, __name__, "Lightning Detected "  + str(distance) + "km away. (%s)" % now)
 	print "Last Interrupt = 0x%x:  %s" % (as3935LastInterrupt, as3935LastStatus)
     tca9545.write_control_register(TCA9545_CONFIG_BUS0)
     time.sleep(0.003)
@@ -628,10 +628,10 @@ def get_weather_pid():
     plist = psutil.pids() 	# load all process pids into plist
     for i in plist: # loop through all pids
 	    if str(psutil.Process(i).name()) == name: # We only care about python processes
-            p = psutil.Process(i) # Load p var with python process
+                p = psutil.Process(i) # Load p var with python process
 	        cmdline = p.cmdline() # Load addition information about this python command in var
 	        if "New_GroveWeatherPi.py" in cmdline[1]: # check second cmd name for our process
-                return i # This is our Weather code pid so give it
+                    return i # This is our Weather code pid so give it
     return None
 
 def get_controlpan_pid():
@@ -673,6 +673,7 @@ def sampleAndDisplay():
     print("MPH wind_gust=\t%0.2f MPH")%(currentWindGust/1.6)
     print "Wind Direction=\t\t\t %0.2f Degrees" % weatherStation.current_wind_direction()
     print "Wind Direction Voltage=\t\t %0.3f V" % weatherStation.current_wind_direction_voltage()
+    time.sleep(2.0)
 #Send info to OLED
 #    Scroll_SSD1306.addLineOLED(display,  ("Wind Speed=\t%0.2f MPH")%(currentWindSpeed/1.6))
 #    Scroll_SSD1306.addLineOLED(display,  ("Rain Total=\t%0.2f in")%(totalRain/25.4))
@@ -857,68 +858,69 @@ def tweetWeather(Whattotweet):
     currenttime = datetime.utcnow()
     deltatime = currenttime - starttime
     tweettime = "SummerGlen GC time is \t" + time.strftime("%H:%M:%S")
-	twitter = Twython(config.consumer_key, config.consumer_secret, config.access_key, config.access_secret)
-	if Whattotweet == 'tempandhum':
+    twitter = Twython(config.consumer_key, config.consumer_secret, config.access_key, config.access_secret)
+    if Whattotweet == 'tempandhum':
         temphum = "Current Temp: %0.1f C " % outsideTemperature + "Current Humidity: %0.1f %%" % outsideHumidity
         tweet = str(tweettime)+" "+str(temphum)
         twitter.update_status(status=tweet)
         print("Tweeted: {}".format(tweet))
-	elif Whattotweet == 'rain':
-	    raintweet = "Rain Total=\t%0.2f in")%(totalRain/25.4 + " " + "Rain Last 60 Minutes=\t%0.2f in")%(rain60Minutes/25.4
-		tweet = str(tweettime)+" "+str(raintweet)
+    elif Whattotweet == 'rain':
+        raintweet = "Rain Total=\t%0.2f in" % (totalRain/25.4) + " " + "Rain Last 60 Minutes=\t%0.2f in" % (rain60Minutes/25.4)
+	tweet = str(tweettime)+" "+str(raintweet)
+        twitter.update_status(status=tweet)
         print("Tweeted: {}".format(tweet))
-	elif Whattotweet == 'wind':
-		if (currentWindDirection == 0):
-			winddir = "South"
-		elif (currentWindDirection == 22.5):
-			winddir = "SSW"
-		elif (currentWindDirection == 45):
-			winddir = "SW"
-		elif (currentWindDirection == 67.5):
-			winddir = "WSW"
-		elif (currentWindDirection == 90):
-			winddir = "West"
-		elif (currentWindDirection == 112.5):
-			winddir = "WNW"
-		elif (currentWindDirection == 135):
-			winddir = "NW"
-		elif (currentWindDirection == 157.5):
-			winddir = "NNW"
-		elif (currentWindDirection == 180):
-			winddir = "North"
-		elif (currentWindDirection == 202.5):
-			winddir = "NNE"
-		elif (currentWindDirection == 225):
-			winddir = "NE"
-		elif (currentWindDirection == 247.5):
-			winddir = "ENE"
-		elif (currentWindDirection == 270):
-			winddir = "East"
-		elif (currentWindDirection == 292.5):
-			winddir = "ESE"
-		elif (currentWindDirection == 315):
-			winddir = "SE"
-		elif (currentWindDirection == 337.5):
-			winddir = "SSE"
-		windtweet = "Current Wind Speed=\t%0.2f MPH")%(currentWindSpeed/1.6) + " " + "Current Wind Gust=\t%0.2f MPH")%(currentWindGust/1.6) + " " + "Wind out of the\t%s " % winddir
+    elif Whattotweet == 'wind':
+	if (currentWindDirection == 0.00):
+            winddir = "South"
+	elif (currentWindDirection == 22.50):
+	    winddir = "SSW"
+	elif (currentWindDirection == 45.00):
+	    winddir = "SW"
+	elif (currentWindDirection == 67.5):
+	    winddir = "WSW"
+	elif (currentWindDirection == 90.00):
+	    winddir = "West"
+	elif (currentWindDirection == 112.50):
+	    winddir = "WNW"
+	elif (currentWindDirection == 135.00):
+            winddir = "NW"
+	elif (currentWindDirection == 157.50):
+	    winddir = "NNW"
+	elif (currentWindDirection == 180.00):
+	    winddir = "North"
+	elif (currentWindDirection == 202.50):
+	    winddir = "NNE"
+	elif (currentWindDirection == 225.00):
+	    winddir = "NE"
+	elif (currentWindDirection == 247.50):
+	    winddir = "ENE"
+	elif (currentWindDirection == 270.00):
+	    winddir = "East"
+	elif (currentWindDirection == 292.50):
+	    winddir = "ESE"
+	elif (currentWindDirection == 315.00):
+	    winddir = "SE"
+	elif (currentWindDirection == 337.50):
+	    winddir = "SSE"
+	windtweet = "Current Wind Speed=\t%0.2f MPH" % (currentWindSpeed/1.6) + " " + "Current Wind Gust=\t%0.2f MPH" % (currentWindGust/1.6) + " " + "Wind out of the\t%s " % winddir
         tweet = str(tweettime)+" "+str(windtweet)
         twitter.update_status(status=tweet)
         print("Tweeted: {}".format(tweet))
     elif Whattotweet == 'thgraph':
-	    msg = "SummerGlen GC 10 day Temperature Humidity Graph"
-	    with open('/home/pi/SDL_Pi_GroveWeatherPi/RasPiConnectServer/static/TemperatureHumidityGraph.png', 'rb') as image:
+	msg = "SummerGlen GC 10 day Temperature Humidity Graph"
+	with open('/home/pi/SDL_Pi_GroveWeatherPi/static/TemperatureHumidityGraph.png', 'rb') as image:
+            twitter.update_status_with_media(status=msg, media=image)
+	print("Tweeted: Temp/Hum graph")
+    elif Whattotweet == 'windgraph':
+	msg = "SummerGlen GC 10 day Wind Speed and Gust Graph"
+	with open('/home/pi/SDL_Pi_GroveWeatherPi/static/WindGraph.png', 'rb') as image:
 	    twitter.update_status_with_media(status=msg, media=image)
-	    print("Tweeted: Temp/Hum graph")
-	elif Whattotweet == 'windgraph':
-		msg = "SummerGlen GC 10 day Wind Speed and Gust Graph"
-		with open('/home/pi/SDL_Pi_GroveWeatherPi/RasPiConnectServer/static/WindGraph.png', 'rb') as image:
-		twitter.update_status_with_media(status=msg, media=image)
-		print("Tweeted: Wind graph")
-	elif Whattotweet == 'barograph':
-		msg = "SummerGlen GC 10 day Barometric Pressure and Lightning Graph"
-		with open('/home/pi/SDL_Pi_GroveWeatherPi/RasPiConnectServer/static/BarometerLightningGraph.png', 'rb') as image:
-		twitter.update_status_with_media(status=msg, media=image)
-		print("Tweeted: Barometric Pressure graph")
+	print("Tweeted: Wind graph")
+    elif Whattotweet == 'barograph':
+	msg = "SummerGlen GC 10 day Barometric Pressure and Lightning Graph"
+	with open('/home/pi/SDL_Pi_GroveWeatherPi/static/BarometerLightningGraph.png', 'rb') as image:
+	    twitter.update_status_with_media(status=msg, media=image)
+	print("Tweeted: Barometric Pressure graph")
 
 def writeWeatherRecord():
     global as3935LightningCount
@@ -932,18 +934,18 @@ def writeWeatherRecord():
 
 # now we have the data, stuff it in the database
     try:
-	    print("trying database")
-    	con = mdb.connect('localhost', 'root', config.MySQL_Password, 'WeatherPi');
-    	cur = con.cursor()
-	    print "before query"
-	    query = 'INSERT INTO WeatherData(TimeStamp,as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  outsideTemperature, outsideHumidity, currentWindDirection, currentWindDirectionVoltage, insideTemperature, insideHumidity) VALUES(LOCALTIMESTAMP(), %.3f, %.3f, %.3f, "%s", %.3f, %.3f, %.3f, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  outsideTemperature, outsideHumidity, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity)
-	    print("query=%s" % query)
-	    cur.execute(query)
+	print("trying database")
+        con = mdb.connect('localhost', 'root', config.MySQL_Password, 'WeatherPi');
+        cur = con.cursor()
+	print "before query"
+	query = 'INSERT INTO WeatherData(TimeStamp,as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  outsideTemperature, outsideHumidity, currentWindDirection, currentWindDirectionVoltage, insideTemperature, insideHumidity) VALUES(LOCALTIMESTAMP(), %.3f, %.3f, %.3f, "%s", %.3f, %.3f, %.3f, %i, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (as3935LightningCount, as3935LastInterrupt, as3935LastDistance, as3935LastStatus, currentWindSpeed, currentWindGust, totalRain,  bmp180Temperature, bmp180Pressure, bmp180Altitude,  bmp180SeaLevel,  outsideTemperature, outsideHumidity, currentWindDirection, currentWindDirectionVoltage, HTUtemperature, HTUhumidity)
+	print("query=%s" % query)
+	cur.execute(query)
 # Sunlight Sensor database
-	    query = 'INSERT INTO Sunlight(TimeStamp, Visible, IR, UV, UVIndex) VALUES(LOCALTIMESTAMP(), %d, %d, %d, %.3f)' % (SunlightVisible, SunlightIR, SunlightUV, SunlightUVIndex)
-	    print("query=%s" % query)
-	    cur.execute(query)
-	    con.commit()
+	query = 'INSERT INTO Sunlight(TimeStamp, Visible, IR, UV, UVIndex) VALUES(LOCALTIMESTAMP(), %d, %d, %d, %.3f)' % (SunlightVisible, SunlightIR, SunlightUV, SunlightUVIndex)
+	print("query=%s" % query)
+	cur.execute(query)
+	con.commit()
     except mdb.Error, e:
     	print "Error %d: %s" % (e.args[0],e.args[1])
     	con.rollback()
@@ -951,8 +953,8 @@ def writeWeatherRecord():
     finally:
        	cur.close()
         con.close()
-	    del cur
-	    del con
+	del cur
+	del con
 
 def writePowerRecord():
 # now we have the data, stuff it in the database
@@ -960,11 +962,11 @@ def writePowerRecord():
 	print("trying database")
         con = mdb.connect('localhost', 'root', config.MySQL_Password, 'WeatherPi');
     	cur = con.cursor()
-	    print "before query"
-	    query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (LOCALTIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge)
-	    print("query=%s" % query)
-	    cur.execute(query)
-	    con.commit()
+	print "before query"
+	query = 'INSERT INTO PowerSystem(TimeStamp, batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge) VALUES (LOCALTIMESTAMP (), %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f, %.3f)' % (batteryVoltage, batteryCurrent, solarVoltage, solarCurrent, loadVoltage, loadCurrent, batteryPower, solarPower, loadPower, batteryCharge)
+	print("query=%s" % query)
+	cur.execute(query)
+	con.commit()
     except mdb.Error, e:
        	print "Error %d: %s" % (e.args[0],e.args[1])
         con.rollback()
@@ -973,7 +975,7 @@ def writePowerRecord():
         cur.close()
         con.close()
         del cur
-	    del con
+	del con
 
 WATCHDOGTRIGGER = 17
 
@@ -1015,10 +1017,10 @@ def checkInternetConnection():
     except urllib2.URLError:
         print "Internet Not Connected"
         time.sleep(1)
-	    return False
+	return False
     else:
         print "Internet Connected"
-	    return True
+	return True
 
 WLAN_check_flg = 0
 
@@ -1125,7 +1127,7 @@ while True:
 # process Interrupts from Lightning
     if (as3935Interrupt == True):
 	try:
-        process_as3935_interrupt()
+            process_as3935_interrupt()
 	except:
 	    print "exception - as3935 I2C did not work"
 
@@ -1135,37 +1137,37 @@ while True:
     processCommand()
     if ((secondCount % 10) == 0):
 # print every 10 seconds
-	   sampleAndDisplay()
-	   patTheDog()      # reset the WatchDog Timer
-	   blinkSunAirLED2X(2)
+        sampleAndDisplay()
+	patTheDog()      # reset the WatchDog Timer
+	blinkSunAirLED2X(2)
 # every 5 minutes, push data to mysql, update rain total and check for shutdown
     if ((secondCount % (5*60)) == 0):
         sampleSystemStats()
         sampleWeather()
         sampleSunAirPlus()
-		updateRain()
-	    writeWeatherRecord()
-	    writePowerRecord()
+	updateRain()
+        writeWeatherRecord()
+	writePowerRecord()
         checkForShutdown()
 # every 15 minutes, build new graphs
     if ((secondCount % (15*60)) == 0):
         sampleSystemStats()
         sampleWeather()
         sampleSunAirPlus()
-	    doAllGraphs.doAllGraphs()
+	doAllGraphs.doAllGraphs()
 # every 30 minutes, check wifi connections
     if ((secondCount % (30*60)) == 0):
     	WLAN_check()
 # Every 2 hours Tweet basic Weather
-#    if ((secondCount % (1*60)) == 0):
-#        sampleWeather()
-#        tweetWeather()
+    if ((secondCount % (1*60)) == 0):
+        sampleWeather()
+        tweetWeather('barograph')
 # every 48 hours, reboot
     if ((secondCount % (60*60*48)) == 0):
-	   rebootPi("48 hour reboot")
-       secondCount = secondCount + 1
+        rebootPi("48 hour reboot")
+    secondCount = secondCount + 1
 	# reset secondCount to prevent overflow forever
     if (secondCount == 1000001):
-	    secondCount = 1
+	secondCount = 1
 
     time.sleep(1.0)
