@@ -8,3 +8,5 @@ Local.py - Python Code to get data from the weatherstation to the ipad app.
 /graphs - individial graphs
 
 doAllGraphs.py - Kick off various graph jobs.
+
+NewWP.py - Original version 1.0 weather station code.
